@@ -1,6 +1,6 @@
 {
   "name": "opencodev2-ttft",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "type": "module",
   "description": "Minimal OC2 prompt-footer TTFT for the latest observed assistant step, not a historical average",

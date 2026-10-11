@@ -36,8 +36,11 @@ export function createTiming() {
         return true
       }
       if (!step || step.messageID !== data.assistantMessageID || step.state !== "waiting") return false
-      if (deltas.has(event.type)) {
-        if (typeof data.delta !== "string" || !data.delta.length || !timestamp(event.created) || event.created < step.started) return false
+      const firstOutput = deltas.has(event.type) ? data.delta :
+        event.type === "session.tool.input.started" ? data.name :
+        event.type === "session.text.ended" || event.type === "session.reasoning.ended" ? data.text : undefined
+      if (typeof firstOutput === "string" && firstOutput.length) {
+        if (!timestamp(event.created) || event.created < step.started) return false
         step.milliseconds = event.created - step.started
         step.state = "measured"
         return true

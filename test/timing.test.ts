@@ -30,6 +30,19 @@ test("late prior-step events and other sessions cannot overwrite current result"
   expect(t.label("other")).toBe("TTFT 6.0s")
 })
 
+for (const [type, payload] of [
+  ["session.tool.input.started", { name: "read" }],
+  ["session.text.ended", { text: "done-only content" }],
+  ["session.reasoning.ended", { text: "done-only reasoning" }],
+] as const) {
+  test(`first observable output without streaming delta (${type})`, () => {
+    const t = createTiming();t.handle(start("s", "m", 1000))
+    t.handle({ type, created: 1400, data: { sessionID: "s", assistantMessageID: "m", ...payload } })
+    expect(t.label("s")).toBe("TTFT 0.4s")
+    t.handle(delta("s", "m", 1800));expect(t.label("s")).toBe("TTFT 0.4s")
+  })
+}
+
 test("invalid and unavailable timing never fabricates zero or a historical number", () => {
   const t = createTiming();t.handle(delta("s", "m", 5000));expect(t.label("s")).toBe("TTFT —")
   t.handle(start("s", "m", NaN));expect(t.label("s")).toBe("TTFT —")

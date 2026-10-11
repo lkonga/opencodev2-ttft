@@ -1,28 +1,49 @@
-# Minimal OC2 TTFT
+# opencodev2-ttft
 
-One prompt-footer label: **`TTFT 1.2s`**. No TPS, sidebar, token/cost report,
-history aggregation, server hook, storage or provider call.
+Minimal **OpenCode V2** plugin: one `TTFT 1.2s` label in the prompt footer.
+No sidebar, TPS, historical averages, backend hooks, polling or network requests.
 
-Measures the latest **observed native assistant step**: request-dispatch
-`session.step.started.data.started` to the first nonempty text, reasoning or
-tool-input output's server timestamp. A tool-name start is already observable
-output; done-only text/reasoning is measured when delivered if no delta arrived.
-Reasoning counts as the first token, not
-only visible final text. This is observable upstream delivery latency, not
-provider-internal execution or user-prompt-to-answer wall time.
+## Install
 
-- New step: `TTFT …` until first content, then its value is held.
-- Next step: reset immediately; **never a session/tree historical average**.
-- Client attached mid-step, failed/empty step or reconnect: `TTFT —` rather than
-  guessing from old messages or displaying a stale value.
-- Other sessions, late previous-step deltas and invalid timestamps cannot change
-  the selected session's value. No timers or histories are scanned.
+```sh
+git clone https://github.com/lkonga/opencodev2-ttft.git \
+  ~/.local/share/opencodev2-ttft
+```
 
-CLI-only registration points to this package in OC2 `cli.json.plugins`.
-Verified target: OC2 `2.0.26-dev-patched-710f3f2664`, Linux/Bun with the host's
-shared Solid/OpenTUI runtime. No core patch/server restart is required.
+Append its **absolute directory** to `plugins` in your OC2 `cli.json`:
 
-Uses the same native-event boundaries inspected in the MIT-licensed
-`chenlongapps/opencode-token-usage@0.4.9`, but this is a separate small tracker;
-it does not copy that package's history-average/controller/UI implementation.
-No claim is made for untested OC2 versions or hidden provider reasoning.
+```json
+{
+  "plugins": ["/absolute/path/to/opencodev2-ttft"]
+}
+```
+
+Keep existing entries. Reload the **CLI client**; no server restart is needed.
+Use your active OC2 config directory; custom wrappers may select a different
+location from the default `~/.config/opencode/cli.json`.
+
+## Meaning
+
+- Latest **observed assistant step**: native request-dispatch timestamp → first
+  nonempty text, reasoning or tool output. Both timestamps come from the server.
+- `TTFT …`: waiting for first output. A new step resets the measurement.
+- `TTFT —`: unavailable, attached mid-step, empty/failed step or reconnected.
+- Tool-name starts count as output; done-only content counts when delivered.
+
+Not a session average, provider-internal timing, or separate physical-retry metric.
+Hidden reasoning is unobservable. Old-session/old-step events cannot overwrite
+the selected step's result.
+
+## Compatibility
+
+Verified on Linux with OC2 `2.0.26-dev-patched-710f3f2664` and its shared
+Solid/OpenTUI runtime. Other builds are not certified. Requires native step/output
+events and the `prompt.footer` plugin slot; no additional core patch is supplied.
+
+Tests cover reset, first-output variants, invalid timing, isolation, cleanup and
+real OpenTUI rendering: **11 passing tests** plus strict type checks.
+
+## License
+
+[MIT](LICENSE). A small independent tracker using native OC2 events; not a fork
+of the token-usage plugin's historical aggregation implementation.

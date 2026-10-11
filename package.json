@@ -1,0 +1,9 @@
+{
+  "name": "opencodev2-ttft",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Minimal OC2 prompt-footer TTFT for the latest observed assistant step, not a historical average",
+  "exports": { "./tui": "./tui.tsx" },
+  "peerDependencies": { "@opencode/plugin": "2.0.26", "@opentui/core": "0.5.17", "@opentui/solid": "0.5.17", "solid-js": "1.9.15" }
+}

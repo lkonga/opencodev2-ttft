@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "noEmit": true,
+    "target": "ESNext",
+    "module": "Preserve",
+    "moduleResolution": "Bundler",
+    "jsx": "preserve",
+    "jsxImportSource": "@opentui/solid",
+    "skipLibCheck": true,
+    "types": ["bun"],
+    "allowImportingTsExtensions": true
+  },
+  "include": ["timing.ts", "tui.tsx", "test/**/*.ts", "test/**/*.tsx"]
+}
